@@ -1,12 +1,13 @@
 import "./globals.css";
+import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import ParticlesBackground from "./components/ParticlesBackground";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Domus AI",
-  description: "Real estate analytics powered by AI",
+  description: "Smarter Real Estate Decisions",
 };
 
 export default function RootLayout({
