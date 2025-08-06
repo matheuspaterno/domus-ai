@@ -45,10 +45,11 @@ export default function WaitlistSignup() {
       if (insertError) throw insertError
 
       setSubmitted(true)
-      setEmail('') // clear input
+      setEmail('') // Clear input
 
-    } catch (err: any) {
-      console.error('Supabase error:', err.message || err)
+    } catch (err) {
+      const error = err instanceof Error ? err.message : String(err)
+      console.error('Supabase error:', error)
       setErrorMsg('Something went wrong. Please try again later.')
     }
   }
@@ -64,10 +65,12 @@ export default function WaitlistSignup() {
         placeholder="Enter your email"
       />
 
-      <button type="submit"
-  className="bg-white text-black p-2 rounded w-full sm:w-auto 
-             cursor-pointer transition duration-200 
-             hover:bg-gray-200 active:bg-gray-300">
+      <button
+        type="submit"
+        className="bg-white text-black p-2 rounded w-full sm:w-auto 
+               cursor-pointer transition duration-200 
+               hover:bg-gray-200 active:bg-gray-300"
+      >
         Join Waitlist
       </button>
 
