@@ -25,7 +25,7 @@ export default function Home() {
       <section className="max-w-3xl mb-20">
         <h2 className="text-3xl font-semibold mb-4">Upcoming Features</h2>
         <ul className="list-disc list-inside text-gray-300 space-y-2 text-left">
-          <li>MLS data lookups and title/lien alerts</li>
+          <li>MLS data lookup and title/lien alerts</li>
           <li>Investor growth scores based on real-world trends</li>
           <li>AI-powered property research and lead scraping</li>
           <li>Twitter-based real estate assistant</li>
