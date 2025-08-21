@@ -1,9 +1,21 @@
 @import "tailwindcss";
 
+/* Force a consistent (light-controlled) color scheme so iOS WebView
+   doesn't auto-darken or dim text */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0a0a0a;     /* you're using a dark hero */
+  --foreground: #ffffff;
+  color-scheme: light;
 }
+
+/* If you still want OS dark mode later, you can re-enable it, but for
+   LinkedIn/WebView consistency we keep a fixed palette */
+ /* @media (prefers-color-scheme: dark) {
+   :root {
+     --background: #0a0a0a;
+     --foreground: #ededed;
+   }
+ } */
 
 @theme inline {
   --color-background: var(--background);
@@ -12,15 +24,36 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  -webkit-text-size-adjust: 100%;
 }
+
+/* ===== Fix headline dimming in LinkedIn WebView =====
+   Ensure the animated background sits UNDER the content */
+.bg-canvas, .background-canvas, canvas.bg-canvas {
+  position: fixed;           /* or absolute; ensure it covers the viewport */
+  inset: 0;
+  z-index: 0;                /* behind everything */
+  pointer-events: none;      /* don't intercept taps/scroll */
+}
+
+/* Wrap your page content in a container with this class */
+.site-content, .content, .hero, main {
+  position: relative;
+  z-index: 1;                /* above the background layer */
+}
+
+/* Make sure headings are fully opaque and not affected by any parent opacity */
+h1, h2, h3 {
+  color: var(--foreground);
+  opacity: 1 !important;
+  -webkit-text-fill-color: var(--foreground);  /* guards against iOS smart-invert */
+  text-shadow: 0 0 0 rgba(0,0,0,0);            /* prevents subpixel blending artifacts */
+}
+
+/* Avoid using opacity on wrappers; use rgba backgrounds instead */
+.opacity-wrap { opacity: 1 !important; } /* (safety) */
+.bg-overlay-85 { background: rgba(0,0,0,0.85); }
