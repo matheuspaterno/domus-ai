@@ -18,10 +18,10 @@ export default function ParticlesBackground() {
         preset: "links",
         fullScreen: {
           enable: true,
-          zIndex: -1, // pushes it behind everything
+          zIndex: 0,
         },
         background: {
-          color: "#000000",
+          color: "transparent",
         },
         particles: {
           move: {
