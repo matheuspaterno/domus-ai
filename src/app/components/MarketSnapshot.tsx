@@ -58,7 +58,12 @@ const MarketSnapshot = () => {
       </div>
 
       {error && <div className="mt-2 p-3 bg-red-800/30 text-red-200 rounded whitespace-pre-wrap">{error}</div>}
-      {responseText && <div className="mt-2 p-3 bg-white/5 rounded whitespace-pre-wrap">{responseText}</div>}
+      {responseText && (
+        <div className="mt-2 space-y-2">
+          <div className="flex justify-end"><div className="chat-bubble user">{query}</div></div>
+          <div className="flex justify-start"><div className="chat-bubble assistant">{responseText}</div></div>
+        </div>
+      )}
     </section>
   );
 };

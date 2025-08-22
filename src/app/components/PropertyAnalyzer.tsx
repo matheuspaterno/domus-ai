@@ -75,9 +75,9 @@ export default function PropertyAnalyzer() {
       )}
 
       {analysis && (
-        <div className="mt-4 p-4 border border-gray-300 rounded">
-          <h3 className="font-semibold">Analysis:</h3>
-          <p>{analysis}</p>
+        <div className="mt-4 space-y-2">
+          <div className="flex justify-end"><div className="chat-bubble user">{input}</div></div>
+          <div className="flex justify-start"><div className="chat-bubble assistant">{analysis}</div></div>
         </div>
       )}
     </section>

@@ -64,16 +64,21 @@ export default function LLMChat() {
     <div className="w-full bg-gray-900/50 p-4 rounded-md text-left">
       <div className="mb-3">
         <h3 className="text-xl font-semibold">Ask Domus AI</h3>
-        <p className="text-sm text-gray-300">Property research, liens, market snapshot — try questions like “What is a lien?”</p>
+        <p className="text-sm text-gray-300">Property research, liens, market snapshot — try questions like “What is a lien?” (Not financial advice).</p>
       </div>
 
-      <div className="space-y-3 max-h-64 overflow-auto mb-3">
+      <div className="space-y-3 max-h-64 overflow-auto mb-3 messages">
         {messages.length === 0 && <p className="text-gray-400">No conversation yet — ask something.</p>}
         {messages.map((m, i) => (
-          <div key={i} className={`p-2 rounded ${m.role === 'user' ? 'bg-white/10 text-white ml-auto max-w-[80%]' : 'bg-white/5 text-gray-100 max-w-[80%]'}`}>
-            <div className="text-sm">{m.text}</div>
-            <div className="text-xs text-gray-400 mt-1">{m.role}</div>
-          </div>
+          m.role === 'user' ? (
+            <div key={i} className="flex justify-end">
+              <div className="chat-bubble user">{m.text}</div>
+            </div>
+          ) : (
+            <div key={i} className="flex justify-start">
+              <div className="chat-bubble assistant">{m.text}</div>
+            </div>
+          )
         ))}
       </div>
 

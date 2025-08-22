@@ -38,7 +38,12 @@ const Glossary = () => {
         <input value={term} onChange={handleInputChange} className="flex-1 px-3 py-2 rounded bg-white text-black" placeholder="Enter term (e.g., lien)" />
         <button type="submit" className="px-4 py-2 bg-white text-black rounded" disabled={loading}>{loading ? 'Thinking...' : 'Explain'}</button>
       </form>
-      {definition && <div className="mt-4 p-3 bg-white/5 rounded">{definition}</div>}
+      {definition && (
+        <div className="mt-4 space-y-2">
+          <div className="flex justify-end"><div className="chat-bubble user">{term}</div></div>
+          <div className="flex justify-start"><div className="chat-bubble assistant">{definition}</div></div>
+        </div>
+      )}
     </section>
   );
 };

@@ -1,81 +1,75 @@
-'use client'
+"use client"
 
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
 export default function WaitlistSignup() {
   const [email, setEmail] = useState('')
-  const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [success, setSuccess] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const validateEmail = (value: string) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return re.test(value)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSubmitted(false)
     setErrorMsg('')
+    setSuccess('')
 
     const cleanEmail = email.trim().toLowerCase()
-
-    // Basic frontend email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(cleanEmail)) {
+    if (!validateEmail(cleanEmail)) {
       setErrorMsg('Please enter a valid email address.')
       return
     }
 
+    setSubmitting(true)
     try {
-      // Check if email already exists
-      const { data: existing, error: checkError } = await supabase
-        .from('waitlist')
-        .select('id')
-        .eq('email', cleanEmail)
-        .limit(1)
-
+      // avoid duplicates
+      const { data: existing, error: checkError } = await supabase.from('waitlist').select('id').eq('email', cleanEmail).limit(1)
       if (checkError) throw checkError
-
       if (existing && existing.length > 0) {
-        setErrorMsg('This email is already on the waitlist.')
+        setErrorMsg('This email is already registered.')
         return
       }
 
-      // Insert new email
-      const { error: insertError } = await supabase
-        .from('waitlist')
-        .insert([{ email: cleanEmail }])
+      const { error } = await supabase.from('waitlist').insert([{ email: cleanEmail, created_at: new Date().toISOString() }])
+      if (error) throw error
 
-      if (insertError) throw insertError
-
-      setSubmitted(true)
-      setEmail('') // Clear input
-
+      setSuccess('Thanks — we will connect you with an agent shortly.')
+      setEmail('')
     } catch (err) {
-      const error = err instanceof Error ? err.message : String(err)
-      console.error('Supabase error:', error)
+      const message = err instanceof Error ? err.message : String(err)
+      console.error('Waitlist insert error:', message)
       setErrorMsg('Something went wrong. Please try again later.')
+    } finally {
+      setSubmitting(false)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto mt-8">
+    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-center gap-4 w-full mt-6">
       <input
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         required
-        className="px-4 py-2 rounded text-black bg-white placeholder-gray-500 w-full sm:w-auto"
+        className="flex-1 px-4 py-3 rounded text-white bg-white/3 placeholder-gray-300 w-full"
         placeholder="Enter your email"
       />
 
       <button
         type="submit"
-        className="bg-white text-black p-2 rounded w-full sm:w-auto 
-               cursor-pointer transition duration-200 
-               hover:bg-gray-200 active:bg-gray-300"
+        disabled={submitting}
+        className="btn-primary w-full sm:w-48"
       >
-        Join Waitlist
+        {submitting ? 'Sending...' : 'Contact an Agent'}
       </button>
 
-      {submitted && <p className="text-green-500 mt-2 sm:mt-0 sm:ml-4">Thanks for signing up!</p>}
-      {errorMsg && <p className="text-red-500 mt-2 sm:mt-0 sm:ml-4">{errorMsg}</p>}
+      {success && <p className="text-green-400 mt-3 sm:mt-0 sm:ml-4">{success}</p>}
+      {errorMsg && <p className="text-red-400 mt-3 sm:mt-0 sm:ml-4">{errorMsg}</p>}
     </form>
   )
 }

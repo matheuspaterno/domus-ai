@@ -1,59 +1,109 @@
-@import "tailwindcss";
+/* Tailwind directives (will be used if PostCSS + Tailwind are working) */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Force a consistent (light-controlled) color scheme so iOS WebView
-   doesn't auto-darken or dim text */
-:root {
-  --background: #0a0a0a;     /* you're using a dark hero */
-  --foreground: #ffffff;
-  color-scheme: light;
+/* Fallback/basic styles so site looks okay if Tailwind isn't processed */
+:root{
+  --bg:#0C2121;
+  --panel:#0f1724;
+  --muted:#9ca3af;
+  --accent:#0F6B66;
+  --glass: rgba(255,255,255,0.04);
+  --glass-strong: rgba(255,255,255,0.06);
+  --card-shadow: 0 6px 24px rgba(2,6,23,0.6);
+  --white:#ffffff;
 }
 
-/* If you still want OS dark mode later, you can re-enable it, but for
-   LinkedIn/WebView consistency we keep a fixed palette */
- /* @media (prefers-color-scheme: dark) {
-   :root {
-     --background: #0a0a0a;
-     --foreground: #ededed;
-   }
- } */
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html,body,#__next{
+  height:100%;
+  margin:0;
+  background:var(--bg);
+  color:var(--white);
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-text-size-adjust: 100%;
+/* Basic container */
+.max-w-5xl{ max-width: 64rem; margin-left:auto; margin-right:auto; }
+.mx-auto{ margin-left:auto; margin-right:auto; }
+.px-6{ padding-left:1.5rem; padding-right:1.5rem; }
+.py-24{ padding-top:6rem; padding-bottom:6rem; }
+
+/* Header */
+header{ background: rgba(0,0,0,0.8); border-bottom: none; }
+header a{ color:var(--white); text-decoration:none; display:flex; align-items:center; gap:0.75rem; }
+header img{ display:block; }
+
+/* Modern header */
+header.sticky{ backdrop-filter: none; background: rgba(0,0,0,0.8); box-shadow: none; border-bottom: none; }
+.site-nav{ display:flex; align-items:center; justify-content:space-between; gap:1rem; }
+.nav-actions{ display:flex; gap:0.5rem; align-items:center; }
+
+
+/* Typography */
+h1, .text-6xl{ font-size:3.5rem; line-height:1; margin:0; }
+h2, .text-3xl{ font-size:1.875rem; margin:0 0 0.75rem 0; }
+p{ color:var(--muted); line-height:1.6; }
+
+/* Hero tweaks */
+.hero-title{ background: linear-gradient(90deg,#fff,#cfcfcf); -webkit-background-clip: text; background-clip: text; color:transparent; }
+.hero-sub{ color: rgba(255,255,255,0.8); }
+
+/* Glass card */
+.glass-card{ background: var(--glass); border: 1px solid rgba(255,255,255,0.06); border-radius:14px; padding:1.25rem; box-shadow: var(--card-shadow); backdrop-filter: blur(8px); }
+
+/* Buttons */
+.btn-primary{ background: linear-gradient(90deg,#0F6B66,#0A554E); color:var(--white); padding:0.65rem 1rem; border-radius:10px; font-weight:600; box-shadow: 0 8px 30px rgba(15,107,102,0.15); border:none; }
+.btn-outline{ background: transparent; border:1px solid rgba(15,107,102,0.12); padding:0.6rem 0.9rem; border-radius:10px; color:var(--white); }
+
+/* AI section */
+.ai-container{ max-width:48rem; margin-left:auto; margin-right:auto; }
+.tool-card{ background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; padding:1rem; border:1px solid rgba(255,255,255,0.04); }
+
+/* Cards / panels */
+.bg-panel{ background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.04); border-radius:12px; padding:1.25rem; }
+
+/* Buttons */
+.btn{
+  display:inline-block;
+  background:var(--accent);
+  color:var(--white);
+  padding:0.5rem 1rem;
+  border-radius:8px;
+  text-decoration:none;
+  border:none;
+  cursor:pointer;
 }
 
-/* ===== Fix headline dimming in LinkedIn WebView =====
-   Ensure the animated background sits UNDER the content */
-.bg-canvas, .background-canvas, canvas.bg-canvas {
-  position: fixed;           /* or absolute; ensure it covers the viewport */
-  inset: 0;
-  z-index: 0;                /* behind everything */
-  pointer-events: none;      /* don't intercept taps/scroll */
+/* Utilities used in the page */
+.flex{ display:flex; }
+.items-center{ align-items:center; }
+.justify-center{ justify-content:center; }
+.text-center{ text-align:center; }
+.rounded-md{ border-radius:6px; }
+.mt-6{ margin-top:1.5rem; }
+.mb-12{ margin-bottom:3rem; }
+
+/* Make sure forms look OK */
+input[type="email"], input[type="text"]{
+  padding:0.5rem 0.75rem;
+  border-radius:6px;
+  border:1px solid rgba(255,255,255,0.08);
+  background:rgba(255,255,255,0.02);
+  color:var(--white);
 }
 
-/* Wrap your page content in a container with this class */
-.site-content, .content, .hero, main {
-  position: relative;
-  z-index: 1;                /* above the background layer */
-}
+/* Chat bubbles (iMessage-like) */
+.messages { padding: 0.25rem; }
+.chat-bubble{ display:inline-block; padding:0.75rem 1rem; border-radius:18px; font-size:0.95rem; line-height:1.3; }
+.chat-bubble.user{ background: #0b84ff; color: white; border-bottom-right-radius: 4px; position: relative; max-width:80%; }
+.chat-bubble.user::after{ content: ""; position:absolute; right:-8px; bottom:0; width:0; height:0; border-left:8px solid #0b84ff; border-top:8px solid transparent; border-bottom:8px solid transparent; }
+.chat-bubble.assistant{ background: #2f3436; color: #e6e6e6; border-bottom-left-radius: 4px; max-width:100%; }
+.chat-bubble.assistant::after{ content: ""; display:none; }
 
-/* Make sure headings are fully opaque and not affected by any parent opacity */
-h1, h2, h3 {
-  color: var(--foreground);
-  opacity: 1 !important;
-  -webkit-text-fill-color: var(--foreground);  /* guards against iOS smart-invert */
-  text-shadow: 0 0 0 rgba(0,0,0,0);            /* prevents subpixel blending artifacts */
+/* small responsive fix */
+@media (max-width:640px){
+  .px-6{ padding-left:1rem; padding-right:1rem; }
+  .py-24{ padding-top:3rem; padding-bottom:3rem; }
+  h1{ font-size:2.25rem; }
 }
-
-/* Avoid using opacity on wrappers; use rgba backgrounds instead */
-.opacity-wrap { opacity: 1 !important; } /* (safety) */
-.bg-overlay-85 { background: rgba(0,0,0,0.85); }
