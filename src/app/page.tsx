@@ -10,7 +10,7 @@ export default function Home() {
           Domus AI
         </h1>
         <p className="mt-6 text-lg sm:text-xl hero-sub max-w-3xl mx-auto">
-          Powerful real estate insights, intelligent automation, and research — instantly.
+          Powerful real estate insights, intelligent automation, and research.
         </p>
         <div className="mt-8 flex justify-center gap-4">
           <a href="#waitlist" className="btn-primary">Contact an Agent</a>
@@ -23,15 +23,19 @@ export default function Home() {
           <h2 className="text-3xl font-semibold mb-4 text-white">About</h2>
           <p className="text-gray-300 leading-relaxed">
             Domus AI builds the future of real estate research and automation. Whether you're an agent,
-            investor, or homeowner, Domus delivers AI-powered insights to help you make smarter decisions —
+            investor, or homeowner, Domus delivers AI-powered insights to help you make smarter decisions, 
             from neighborhood trends to lead discovery and lien alerts.
           </p>
         </section>
       </div>
 
-      {/* AI tools (client) */}
-      <div className="w-full mb-12 ai-container">
-        <AISection />
+      {/* Interact with Domus (AI tools) */}
+      <div className="ai-container mb-12">
+        <section className="glass-card p-10">
+          <h2 className="text-3xl font-semibold mb-4 text-white">Interact with Domus</h2>
+          <p className="text-gray-300 leading-relaxed mb-6">Ask Domus questions, analyze properties, or get quick market snapshots — all powered by AI.</p>
+          <AISection />
+        </section>
       </div>
 
       {/* Upcoming Features */}
@@ -39,7 +43,7 @@ export default function Home() {
         <section id="features" className="glass-card p-10">
           <h2 className="text-3xl font-semibold mb-6 text-white">Upcoming Features</h2>
 
-          <ul className="list-disc list-inside text-gray-300 space-y-3 text-left max-w-2xl">
+          <ul className="list-disc list-inside text-gray-300 space-y-[10px] text-left max-w-2xl">
             <li>MLS data lookup and title / lien alerts</li>
             <li>Investor growth scores based on real-world trends</li>
             <li>AI-powered property research and lead scraping</li>
