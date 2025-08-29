@@ -62,10 +62,7 @@ export default function LLMChat() {
 
   return (
     <div className="w-full bg-gray-900/50 p-4 rounded-md text-left">
-      <div className="mb-3">
-        <h3 className="text-xl font-semibold">Ask Domus AI</h3>
-        <p className="text-sm text-gray-300">Property research, liens, market snapshot — try questions like “What is a lien?” (Not financial advice).</p>
-      </div>
+  {/* header removed per request */}
 
       <div className="space-y-3 max-h-64 overflow-auto mb-3 messages">
         {messages.length === 0 && <p className="text-gray-400">No conversation yet — ask something.</p>}
@@ -93,7 +90,7 @@ export default function LLMChat() {
           onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
         />
         <button
-          className="px-4 py-2 bg-white text-black rounded disabled:opacity-50"
+          className="btn-send"
           onClick={sendMessage}
           disabled={loading}
         >

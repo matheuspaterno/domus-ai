@@ -38,9 +38,18 @@ export async function POST(req: Request) {
         max_output_tokens: 800,
       }),
     })
-    const data = await resp.json()
+
+    // parse response body safely
+    let data: any = null
+    try { data = await resp.json() } catch (e) { data = null }
 
     console.log('[api/openai] full response payload:', JSON.stringify(data))
+
+    // If upstream returned an error (401/429/etc), surface a safe diagnostic to the caller
+    if (!resp.ok) {
+      console.error('[api/openai] upstream error', resp.status, data)
+      return new Response(JSON.stringify({ error: 'Upstream OpenAI error', status: resp.status, details: data }), { status: 502, headers: { 'Content-Type': 'application/json' } })
+    }
 
     // If model reports it was truncated, surface a clear warning to the client
     if (data?.incomplete_details?.reason === 'max_output_tokens') {

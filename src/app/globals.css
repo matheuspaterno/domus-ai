@@ -6,7 +6,10 @@
 /* Fallback/basic styles so site looks okay if Tailwind isn't processed */
 :root{
   --bg:#0C2121;
+  --gold: #FFD966;
   --panel:#0f1724;
+  --roadmap-node-size: 14px;
+  --roadmap-node-radius: 7px;
   --muted:#9ca3af;
   --accent:#0F6B66;
   --glass: rgba(255,255,255,0.04);
@@ -75,6 +78,35 @@ p{ color:var(--muted); line-height:1.6; }
   cursor:pointer;
 }
 
+/* Send button used in LLM chat: matches the LLM form background and is slightly thicker */
+.btn-send{
+  /* match primary contact button visuals */
+  background: linear-gradient(90deg,#0F6B66,#0A554E);
+  color:var(--white);
+  padding:0.6rem 1.2rem;
+  border-radius:10px;
+  font-weight:700;
+  border:none;
+  min-height:40px; /* match typical input height */
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+  box-shadow: 0 8px 30px rgba(15,107,102,0.15);
+}
+.btn-send:hover:not(:disabled){
+  transform: translateY(-2px);
+  box-shadow: 0 14px 40px rgba(10,80,76,0.18);
+  opacity:0.98;
+}
+.btn-send:active:not(:disabled){
+  transform: translateY(0);
+  box-shadow: 0 6px 18px rgba(10,80,76,0.12);
+}
+.btn-send:disabled{ opacity:0.5; cursor:not-allowed; }
+.btn-send:focus{ outline: 2px solid rgba(15,107,102,0.15); outline-offset:2px; }
+
 /* Utilities used in the page */
 .flex{ display:flex; }
 .items-center{ align-items:center; }
@@ -106,4 +138,20 @@ input[type="email"], input[type="text"]{
   .px-6{ padding-left:1rem; padding-right:1rem; }
   .py-24{ padding-top:3rem; padding-bottom:3rem; }
   h1{ font-size:2.25rem; }
+}
+
+/* Roadmap styles */
+.roadmap{ display:flex; flex-direction:column; gap:1.5rem; }
+.roadmap-track{ position:relative; padding-left:0; padding-top:var(--roadmap-node-radius); padding-bottom:var(--roadmap-node-radius); }
+.roadmap-track::before{ display:none; }
+.roadmap-item{ position:relative; padding:0.25rem 0 1.25rem 1.25rem; margin-left:0; }
+.roadmap-item::before{ content:""; position:absolute; left:calc(1.25rem - 20px); top:0.6rem; width:var(--roadmap-node-size); height:var(--roadmap-node-size); border-radius:50%; background:var(--gold); box-shadow:0 0 0 6px rgba(255,217,102,0.06); }
+.roadmap-header{ font-weight:800; color:var(--white); margin-bottom:0.35rem; font-size:1.05rem; }
+.roadmap-bullets{ color:var(--muted); margin:0; padding-left:1rem; }
+.roadmap-bullets li{ margin-bottom:0.5rem; }
+
+@media (min-width:960px){
+  .roadmap{ gap:2rem; }
+  .roadmap-track{ padding-left:0; }
+  .roadmap-item{ margin-left:0; }
 }
