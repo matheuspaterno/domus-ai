@@ -9,7 +9,12 @@ export async function POST(req: Request) {
       body?.message ??
       body?.query ??
       (body?.term ? `Explain this term in plain English: ${body.term}` : undefined)
-    const model = body?.model ?? 'gpt-5-mini'
+
+    // Force the model to GPT-4 on the server regardless of client-sent model
+    const model = 'gpt-4'
+    if (body?.model && body.model !== model) {
+      console.warn(`[api/openai] client requested model ${body.model} - overriding to ${model}`)
+    }
 
     if (!message || typeof message !== 'string') {
       return new Response('Missing or invalid message/query/term', { status: 400 })
@@ -19,6 +24,31 @@ export async function POST(req: Request) {
     if (!apiKey) {
       console.error('[api/openai] missing OPENAI_API_KEY')
       return new Response('Missing API key', { status: 500 })
+    }
+
+    // quick server-side filter: refuse obvious off-topic queries immediately
+    const lower = String(message).toLowerCase()
+    const banned = [
+      // politics / government
+      'politic', 'politics', 'election', 'president', 'senate', 'congress', 'government', 'party', 'campaign',
+      // weather / climate
+      'weather', 'forecast', 'rain', 'temperature', 'storm', 'climate', 'heatwave', 'hurricane',
+      // other common off-topic categories
+      'sports', 'score', 'movie', 'film', 'music', 'song', 'celebrity', 'stock', 'market crash', 'crypto',
+      'health', 'doctor', 'symptom', 'covid', 'vaccine'
+    ]
+
+    const containsBanned = (txt: string | undefined) => {
+      if (!txt) return false
+      const s = String(txt).toLowerCase()
+      return banned.some((kw) => s.includes(kw))
+    }
+
+    if (containsBanned(lower)) {
+      return new Response(JSON.stringify({ answer: 'I can only answer real estate related questions.' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
     }
 
     // Use the Responses API which returns `output_text` / `output` reliably for these models
@@ -31,7 +61,7 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         model,
         input: [
-          { role: 'system', content: 'You are Domus AI — a concise, helpful assistant for real estate questions.' },
+          { role: 'system', content: 'You are Domus AI — a concise, helpful assistant specialized in real estate. ONLY answer questions directly related to real estate, property, housing, mortgages, home buying, selling, investing, property law, zoning, liens, valuations, or comparable market analysis. If the user asks about topics outside real estate (for example: politics, weather, sports, entertainment, health, general news, or finance unrelated to property investing), reply exactly: "I can only answer real estate related questions." Do NOT provide any additional information or attempt to answer off-topic requests.' },
           { role: 'user', content: `${message}\n\nPlease answer concisely in 2-4 short sentences.` }
         ],
         // Increase token budget to avoid truncation (adjust as needed)
@@ -103,6 +133,16 @@ export async function POST(req: Request) {
 
     console.log('[api/openai] extracted reply length:', reply.length)
     if (!reply) console.warn('[api/openai] empty reply - full payload logged above')
+
+    // Post-response safety: if the model's reply appears to include banned topics or is off-topic,
+    // replace with the canned real-estate-only message to guarantee policy.
+    if (containsBanned(reply)) {
+      console.warn('[api/openai] reply contained banned topic; replacing with canned message')
+      return new Response(JSON.stringify({ answer: 'I can only answer real estate related questions.' , raw: data}), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
 
     return new Response(JSON.stringify({ answer: String(reply), raw: data }), {
       status: 200,

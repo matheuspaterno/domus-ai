@@ -20,7 +20,8 @@ export default function LLMChat() {
       const res = await fetch('/api/openai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userText, model: 'gpt-5-mini' }),
+        // model is enforced server-side to gpt-4; clients should not supply model overrides
+        body: JSON.stringify({ message: userText }),
       })
 
       if (!res.ok) {
@@ -86,7 +87,7 @@ export default function LLMChat() {
           className="flex-1 px-3 py-2 rounded bg-white text-black"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask about property research, liens, market trends..."
+          placeholder="Ask about property research, liens, market trends (real estate only)..."
           onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
         />
         <button

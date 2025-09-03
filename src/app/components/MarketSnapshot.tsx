@@ -18,7 +18,8 @@ const MarketSnapshot = () => {
       const res = await fetch('/api/openai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: query.trim(), model: 'gpt-5-mini' }),
+        // model selection is performed server-side and forced to gpt-4
+        body: JSON.stringify({ query: query.trim() }),
       });
 
       const txt = await res.text();
@@ -53,7 +54,7 @@ const MarketSnapshot = () => {
     <section className="max-w-3xl mb-20">
       <h3 className="text-xl font-semibold mb-2">Market Snapshot (demo)</h3>
       <div className="flex gap-2 mb-2">
-        <input value={query} onChange={(e)=>setQuery(e.target.value)} className="flex-1 px-3 py-2 rounded bg-white text-black" placeholder="Ask: What's the market trend in Miami this month?" />
+  <input value={query} onChange={(e)=>setQuery(e.target.value)} className="flex-1 px-3 py-2 rounded bg-white text-black" placeholder="Ask (real estate only): What's the market trend in Miami this month?" />
         <button onClick={handleAsk} className="px-4 py-2 bg-white text-black rounded" disabled={loading}>{loading ? 'Thinking...' : 'Ask'}</button>
       </div>
 
