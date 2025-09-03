@@ -39,7 +39,7 @@ export default function Home() {
         </section>
       </div>
 
-      {/* Product Roadmap */}
+     
       <div className="ai-container mb-12">
         <section id="roadmap" className="glass-card p-10">
           <h2 className="text-3xl font-semibold mb-6 text-white">Roadmap</h2>
