@@ -51,20 +51,7 @@ export default function Home() {
       {/* Waitlist Section */}
       <section id="waitlist" className="mt-8">
         <div className="ai-container mb-8">
-          <section className="glass-card p-6">
-            <p className="text-gray-300 mb-0">
-              Follow the Domus AI agent on Twitter for the latest real estate insights. You can also ask Domus
-              questions by tagging it on posts — it will automatically reply in a few minutes —{' '}
-              <a
-                href="https://twitter.com/Domus_AI"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-400 underline"
-              >
-                @Domus_AI
-              </a>
-            </p>
-          </section>
+          
         </div>
 
   <div className="ai-container mt-[15px] mb-8">
