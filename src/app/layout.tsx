@@ -22,6 +22,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} bg-black text-white scroll-smooth`}>
+        {/* reCAPTCHA v3 */}
+        <script
+          dangerouslySetInnerHTML={{ __html: `window.__grecaptchaOnLoad = function(){}` }}
+        />
+        <script async defer src={`https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}&onload=__grecaptchaOnLoad`}></script>
         <ParticlesClient />
         <div className="flex flex-col min-h-screen">
           <header className="fixed top-0 left-0 right-0 w-full z-50 bg-gray-900/80 backdrop-blur-md text-white/6">

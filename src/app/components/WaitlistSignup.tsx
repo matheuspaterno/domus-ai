@@ -1,7 +1,10 @@
 "use client"
 
 import { useState } from 'react'
-import { supabase } from '../lib/supabaseClient'
+
+declare global {
+  interface Window { grecaptcha?: any }
+}
 
 export default function WaitlistSignup() {
   const [email, setEmail] = useState('')
@@ -27,23 +30,41 @@ export default function WaitlistSignup() {
 
     setSubmitting(true)
     try {
-      // avoid duplicates
-      const { data: existing, error: checkError } = await supabase.from('waitlist').select('id').eq('email', cleanEmail).limit(1)
-      if (checkError) throw checkError
-      if (existing && existing.length > 0) {
-        setErrorMsg('This email is already registered.')
-        return
+      // Get reCAPTCHA v3 token
+      const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY as string
+      if (!window.grecaptcha || !siteKey) {
+        throw new Error('Captcha not ready')
       }
 
-      const { error } = await supabase.from('waitlist').insert([{ email: cleanEmail, created_at: new Date().toISOString() }])
-      if (error) throw error
+      const token: string = await new Promise((resolve, reject) => {
+        try {
+          window.grecaptcha.ready(async () => {
+            try {
+              const t = await window.grecaptcha.execute(siteKey, { action: 'contact_form' })
+              resolve(t)
+            } catch (e) { reject(e) }
+          })
+        } catch (e) { reject(e) }
+      })
 
-      setSuccess('Thanks — we will connect you with an agent shortly.')
+      // Send to server for verification and persistence
+      const res = await fetch('/api/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanEmail, token, action: 'contact_form' }),
+      })
+
+      const payload = await res.json().catch(() => ({}))
+      if (!res.ok || payload?.error) {
+        throw new Error(payload?.error || `Server responded ${res.status}`)
+      }
+
+      setSuccess(payload?.message || 'Thanks — we will connect you with an agent shortly.')
       setEmail('')
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err)
-      console.error('Waitlist insert error:', message)
-      setErrorMsg('Something went wrong. Please try again later.')
+      console.error('Waitlist submission error:', message)
+  setErrorMsg('Verification failed. Please try again.')
     } finally {
       setSubmitting(false)
     }
