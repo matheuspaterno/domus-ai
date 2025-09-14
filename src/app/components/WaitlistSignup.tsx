@@ -31,22 +31,22 @@ export default function WaitlistSignup() {
 
     setSubmitting(true)
     try {
-      // Get reCAPTCHA v3 token
+      // Get reCAPTCHA v3 token with robust readiness check
       const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY as string
-      if (!window.grecaptcha || !siteKey) {
+      if (!siteKey) throw new Error('Missing reCAPTCHA site key')
+
+      // wait up to ~5s for grecaptcha to be injected
+      const waitForGrecaptcha = async (maxMs = 5000, interval = 100): Promise<typeof window.grecaptcha> => {
+        const start = Date.now()
+        while (Date.now() - start < maxMs) {
+          if (window.grecaptcha && typeof window.grecaptcha.execute === 'function') return window.grecaptcha
+          await new Promise(r => setTimeout(r, interval))
+        }
         throw new Error('Captcha not ready')
       }
 
-      const token: string = await new Promise((resolve, reject) => {
-        try {
-          window.grecaptcha.ready(async () => {
-            try {
-              const t = await window.grecaptcha.execute(siteKey, { action: 'contact_form' })
-              resolve(t)
-            } catch (e) { reject(e) }
-          })
-        } catch (e) { reject(e) }
-      })
+      const grecaptcha = await waitForGrecaptcha()
+      const token = await grecaptcha.execute(siteKey, { action: 'contact_form' })
 
       // Send to server for verification and persistence
       const res = await fetch('/api/lead', {
@@ -55,7 +55,7 @@ export default function WaitlistSignup() {
         body: JSON.stringify({ email: cleanEmail, token, action: 'contact_form', website: hp }),
       })
 
-      const payload = await res.json().catch(() => ({}))
+  const payload = await res.json().catch(() => ({} as any))
       if (!res.ok || payload?.error) {
         const extra = payload?.details ? ` (${JSON.stringify(payload.details)})` : ''
         throw new Error((payload?.error || `Server responded ${res.status}`) + extra)
