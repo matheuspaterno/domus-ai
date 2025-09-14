@@ -1,6 +1,6 @@
 import WaitlistSignup from './components/WaitlistSignup'
 import AISection from './components/AISection'
-import Roadmap from './components/Roadmap'
+// import Roadmap from './components/Roadmap'
 
 export default function Home() {
   return (
@@ -40,14 +40,14 @@ export default function Home() {
       </div>
 
      
+      {/** Roadmap banner commented out for lead-gen focus
       <div className="ai-container mb-12">
         <section id="roadmap" className="glass-card p-10">
           <h2 className="text-3xl font-semibold mb-6 text-white">Roadmap</h2>
-
           <Roadmap />
-
         </section>
       </div>
+      */}
       {/* Waitlist Section */}
       <section id="waitlist" className="mt-8">
         <div className="ai-container mb-8">
