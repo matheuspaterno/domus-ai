@@ -57,7 +57,8 @@ export default function WaitlistSignup() {
 
       const payload = await res.json().catch(() => ({}))
       if (!res.ok || payload?.error) {
-        throw new Error(payload?.error || `Server responded ${res.status}`)
+        const extra = payload?.details ? ` (${JSON.stringify(payload.details)})` : ''
+        throw new Error((payload?.error || `Server responded ${res.status}`) + extra)
       }
 
       setSuccess(payload?.message || 'Thanks — we will connect you with an agent shortly.')
@@ -65,7 +66,7 @@ export default function WaitlistSignup() {
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err)
       console.error('Waitlist submission error:', message)
-  setErrorMsg('Verification failed. Please try again.')
+      setErrorMsg(message || 'Verification failed. Please try again.')
     } finally {
       setSubmitting(false)
     }
@@ -90,7 +91,7 @@ export default function WaitlistSignup() {
       <button
         type="submit"
         disabled={submitting}
-        className="btn-primary w-full sm:w-48"
+  className="btn-primary w-full sm:w-48 hover:cursor-pointer disabled:cursor-not-allowed"
       >
         {submitting ? 'Sending...' : 'Contact an Agent'}
       </button>

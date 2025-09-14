@@ -64,7 +64,8 @@ export async function POST(req: Request) {
       return new Response(JSON.stringify({ error: 'Captcha not configured' }), { status: 500, headers: { 'Content-Type': 'application/json' } })
     }
 
-    if (!token) {
+    const bypass = process.env.RECAPTCHA_BYPASS === 'true' && process.env.NODE_ENV !== 'production'
+    if (!token && !bypass) {
       return new Response(JSON.stringify({ error: 'Missing captcha token' }), { status: 400, headers: { 'Content-Type': 'application/json' } })
     }
 
@@ -72,7 +73,9 @@ export async function POST(req: Request) {
     const params = new URLSearchParams()
     params.set('secret', secret)
     params.set('response', token)
-    const verifyResp = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+    const verifyResp = bypass
+      ? new Response(JSON.stringify({ success: true, score: 0.9, action, 'error-codes': [] }), { status: 200 })
+      : await fetch('https://www.google.com/recaptcha/api/siteverify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: params.toString(),
@@ -83,15 +86,20 @@ export async function POST(req: Request) {
 
     if (!verifyResp.ok || !verify?.success) {
       console.warn('[api/lead] Captcha failed', verify)
-      return new Response(JSON.stringify({ error: 'Captcha verification failed' }), { status: 400, headers: { 'Content-Type': 'application/json' } })
+      const payload = { error: 'Captcha verification failed', details: process.env.NODE_ENV !== 'production' ? verify : undefined }
+      return new Response(JSON.stringify(payload), { status: 400, headers: { 'Content-Type': 'application/json' } })
     }
 
     // basic score/action checks (tunable threshold)
-    if (typeof verify.score === 'number' && verify.score < 0.5) {
-      console.warn('[api/lead] Low captcha score', verify.score)
-      return new Response(JSON.stringify({ error: 'Captcha score too low' }), { status: 400, headers: { 'Content-Type': 'application/json' } })
+    const isProd = process.env.NODE_ENV === 'production'
+    const minScore = isProd ? 0.5 : 0.2
+    if (typeof verify.score === 'number' && verify.score < minScore) {
+      console.warn('[api/lead] Low captcha score', { score: verify.score, minScore })
+      const payload = { error: 'Captcha score too low', details: process.env.NODE_ENV !== 'production' ? { score: verify.score, minScore } : undefined }
+      return new Response(JSON.stringify(payload), { status: 400, headers: { 'Content-Type': 'application/json' } })
     }
-    if (verify.action && verify.action !== action) {
+    // Only enforce action match strictly in production to avoid local dev mismatches
+    if (isProd && verify.action && verify.action !== action) {
       console.warn('[api/lead] Action mismatch', { expected: action, got: verify.action })
       return new Response(JSON.stringify({ error: 'Captcha action mismatch' }), { status: 400, headers: { 'Content-Type': 'application/json' } })
     }
@@ -145,7 +153,7 @@ export async function POST(req: Request) {
       if (host && user && pass) {
         const transporter = nodemailer.createTransport({ host, port, secure, auth: { user, pass } })
         const subject = 'Tell us your home preferences'
-        const text = `Hey!\nThank you for reaching out to Domus AI. To help us better understand your needs and match you with the right opportunities, we’d love a bit more detail about what you’re looking for in your next home.\nPlease take a moment to reply to this email with your preferences:\nMotivation – What’s driving your decision to purchase right now?\nTimeline – When would you ideally like to move in?\nLocation – If you don’t have an exact area in mind, tell us about the amenities, commute times, or school districts that matter most.\nPrice Range – Think in terms of your ideal monthly payment.\nBeds / Baths – Minimums you’d like to have.\nSquare Foot Range – What size feels comfortable for you?\nName:\nPhone:\nOnce we have this information, our AI will process your preferences and connect you with the realtor best suited to your needs. That agent will then provide tailored listings and personalized guidance aligned with your goals.\nLooking forward to helping you with the next step,\nBest regards,\nDomus AI`
+        const text = `Hey!\n\nThank you for reaching out to Domus AI. To help me better understand your needs and match you with the right opportunities, I’d love a bit more detail about what you’re looking for in your next home.\n\nPlease take a moment to reply to this email with your preferences:\n\nMotivation – What’s driving your decision to purchase right now?\nTimeline – When would you ideally like to move in?\nLocation – If you don’t have an exact area in mind, tell us about the amenities, commute times, or school districts that matter most.\nPrice Range – Think in terms of your ideal monthly payment.\nBeds / Baths – Minimums you’d like to have.\nSquare Foot Range – What size feels comfortable for you?\nName:\nPhone:\n\nOnce I have this information, I will process your preferences and connect you with the realtor best suited to your needs. That agent will then provide tailored listings and personalized guidance aligned with your goals.\n\nLooking forward to helping you with the next step,\n\nBest regards,\n\nDomus AI`
         await transporter.sendMail({ from, to: email, subject, text })
       } else {
         console.warn('[api/lead] SMTP envs missing; skipping email send')
