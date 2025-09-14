@@ -7,9 +7,16 @@ export default function LLMChat() {
   const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; text: string }[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const MAX_MSGS = 8
 
   async function sendMessage() {
     if (!input.trim()) return
+    // Client-side interaction limit safeguard
+    const userTurns = messages.filter(m => m.role === 'user').length
+    if (userTurns >= MAX_MSGS) {
+      setError('You have reached the limit of messages in this interaction (we are in beta). Please wait 24 hours or reach us in the "Contact a Real Estate Agent" form for more information.')
+      return
+    }
     const userText = input.trim()
     setMessages((m) => [...m, { role: 'user', text: userText }])
     setInput('')
@@ -50,7 +57,14 @@ export default function LLMChat() {
         data?.choices?.[0]?.text ??
         ''
 
-      const finalReply = String(reply).trim() || 'No answer returned. Check server logs.'
+      let finalReply = String(reply).trim() || 'No answer returned. Check server logs.'
+
+      // If the model didn’t include a CTA and it makes sense to suggest once, add a soft suggestion
+      const alreadySuggested = messages.some(m => m.role === 'assistant' && m.text.toLowerCase().includes('contact a real estate agent'))
+      const looksRelevant = /buy|sell|invest|mortgage|pre-approval|list|offer|closing|agent|realtor|property|home/i.test(userText)
+      if (!alreadySuggested && looksRelevant) {
+        finalReply += `\n\nIf you’d like tailored help, you can use the "Contact a Real Estate Agent" form below — we’ll email you for preferences and match you with a local agent.`
+      }
 
       setMessages((m) => [...m, { role: 'assistant', text: finalReply }])
     } catch (err) {

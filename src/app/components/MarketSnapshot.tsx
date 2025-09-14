@@ -7,9 +7,12 @@ const MarketSnapshot = () => {
   const [responseText, setResponseText] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [count, setCount] = useState(0);
+  const MAX_MSGS = 8;
 
   const handleAsk = async () => {
     if (!query.trim()) return;
+  if (count >= MAX_MSGS) { setError('You have reached the limit of messages in this interaction (beta). Please wait 24 hours or use the Contact a Real Estate Agent form.'); return; }
     setLoading(true);
     setResponseText('');
     setError(null);
@@ -41,7 +44,11 @@ const MarketSnapshot = () => {
                      data?.choices?.[0]?.text ??
                      (typeof data === 'string' ? data : JSON.stringify(data));
 
-      setResponseText(String(answer).trim() || 'No answer returned. Check server logs.');
+  let ans = String(answer).trim() || 'No answer returned. Check server logs.'
+  const looksRelevant = /buy|sell|invest|mortgage|pre-approval|list|offer|closing|agent|realtor|property|home/i.test(query)
+  if (looksRelevant) ans += `\n\nFor tailored help, try the "Contact a Real Estate Agent" form below — we’ll email you and match you with a local agent.`
+  setResponseText(ans);
+  setCount(c => c + 1);
     } catch (err) {
       console.error('[MarketSnapshot] fetch failed', err);
       setError('Error fetching data. Check server logs or network.');

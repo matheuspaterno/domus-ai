@@ -6,6 +6,8 @@ export default function PropertyAnalyzer() {
   const [analysis, setAnalysis] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string>('')
+  const [count, setCount] = useState<number>(0)
+  const MAX_MSGS = 8
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value)
@@ -22,6 +24,11 @@ export default function PropertyAnalyzer() {
       return
     }
 
+    // limit interactions
+    if (count >= MAX_MSGS) {
+      setError('You have reached the limit of messages in this interaction (beta). Please wait 24 hours or use the Contact a Real Estate Agent form.')
+      return
+    }
     setLoading(true)
     try {
       const res = await fetch('/api/openai', {
@@ -41,8 +48,11 @@ export default function PropertyAnalyzer() {
         return
       }
 
-      const answer = data?.answer ?? (typeof data === 'string' ? data : JSON.stringify(data))
-      setAnalysis(String(answer))
+  let answer = data?.answer ?? (typeof data === 'string' ? data : JSON.stringify(data))
+  const looksRelevant = /buy|sell|invest|mortgage|pre-approval|list|offer|closing|agent|realtor|property|home/i.test(trimmed)
+  if (looksRelevant) answer += `\n\nNeed personalized help? Use the "Contact a Real Estate Agent" form below — we’ll email you for preferences and match you with a local agent.`
+  setAnalysis(String(answer))
+  setCount(c => c + 1)
     } catch (err) {
       console.error('[PropertyAnalyzer] fetch failed', err)
       setError('Failed to analyze the property. Check server logs or network.')

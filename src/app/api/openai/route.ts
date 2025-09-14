@@ -26,6 +26,39 @@ export async function POST(req: Request) {
       return new Response('Missing API key', { status: 500 })
     }
 
+    // Per-IP daily interaction limit (Upstash Redis, fallback to memory)
+    const ip = (req as any).headers?.get?.('x-forwarded-for')?.split(',')[0]?.trim() || (req as any).headers?.get?.('x-real-ip') || ''
+    const MAX_DAILY = 8
+    const redisUrl = process.env.UPSTASH_REDIS_REST_URL
+    const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN
+    let overLimit = false
+    if (ip && redisUrl && redisToken) {
+      try {
+        const { Redis } = await import('@upstash/redis')
+        const redis = new Redis({ url: redisUrl, token: redisToken })
+        const dateKey = new Date().toISOString().slice(0,10)
+        const key = `domus:ip:${ip}:${dateKey}`
+        const n = await redis.incr(key)
+        if (n === 1) await redis.expire(key, 86400)
+        if (n > MAX_DAILY) overLimit = true
+      } catch (e) {
+        console.warn('[api/openai] Upstash unavailable, falling back to memory')
+        ;(globalThis as any).__domus_ip_daily__ = (globalThis as any).__domus_ip_daily__ || new Map<string, { count: number; windowStart: number }>()
+        const daily: Map<string, { count: number; windowStart: number }> = (globalThis as any).__domus_ip_daily__
+        const DAY_MS = 86400_000
+        const now = Date.now()
+        const bucket = daily.get(ip)
+        if (!bucket || now - bucket.windowStart > DAY_MS) daily.set(ip, { count: 1, windowStart: now })
+        else { bucket.count += 1; if (bucket.count > MAX_DAILY) overLimit = true }
+      }
+    }
+    if (overLimit) {
+      return new Response(JSON.stringify({
+        answer: 'You have reached the limit of messages in this interaction (we are in beta). Please wait 24 hours or reach us in the "Contact a Real Estate Agent" form below for more information.',
+        limit: MAX_DAILY,
+      }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }
+
     // quick server-side filter: refuse obvious off-topic queries immediately
     const lower = String(message).toLowerCase()
     const banned = [
@@ -61,7 +94,7 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         model,
         input: [
-          { role: 'system', content: 'You are Domus AI — a concise, helpful assistant specialized in real estate. ONLY answer questions directly related to real estate, property, housing, mortgages, home buying, selling, investing, property law, zoning, liens, valuations, or comparable market analysis. If the user asks about topics outside real estate (for example: politics, weather, sports, entertainment, health, general news, or finance unrelated to property investing), reply exactly: "I can only answer real estate related questions." Do NOT provide any additional information or attempt to answer off-topic requests.' },
+          { role: 'system', content: 'You are Domus AI — a concise, helpful assistant specialized in real estate. ONLY answer questions directly related to real estate, property, housing, mortgages, home buying, selling, investing, property law, zoning, liens, valuations, or comparable market analysis. If the user asks about topics outside real estate (for example: politics, weather, sports, entertainment, health, general news, or finance unrelated to property investing), reply exactly: "I can only answer real estate related questions." Do NOT provide any additional information or attempt to answer off-topic requests. After answering, if it would genuinely help the user (e.g., they are buying/selling/investing or need personalized assistance), you may add ONE friendly line suggesting they reach out via the "Contact a Real Estate Agent" form below so Domus AI can match them with an agent. Keep it very light and do this at most once.' },
           { role: 'user', content: `${message}\n\nPlease answer concisely in 2-4 short sentences.` }
         ],
         // Increase token budget to avoid truncation (adjust as needed)

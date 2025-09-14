@@ -8,6 +8,7 @@ declare global {
 
 export default function WaitlistSignup() {
   const [email, setEmail] = useState('')
+  const [hp, setHp] = useState('') // honeypot
   const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
@@ -51,7 +52,7 @@ export default function WaitlistSignup() {
       const res = await fetch('/api/lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: cleanEmail, token, action: 'contact_form' }),
+        body: JSON.stringify({ email: cleanEmail, token, action: 'contact_form', website: hp }),
       })
 
       const payload = await res.json().catch(() => ({}))
@@ -71,7 +72,12 @@ export default function WaitlistSignup() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-center gap-4 w-full mt-6">
+    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-center gap-4 w-full mt-6" autoComplete="off">
+      {/* Honeypot field (hidden from users) */}
+      <div style={{ position: 'absolute', left: '-10000px', top: 'auto', width: '1px', height: '1px', overflow: 'hidden' }} aria-hidden="true">
+        <label htmlFor="website">Website</label>
+        <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" value={hp} onChange={(e)=>setHp(e.target.value)} />
+      </div>
       <input
         type="email"
         value={email}

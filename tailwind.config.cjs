@@ -1,8 +1,7 @@
 module.exports = {
   content: [
+    // Scan all files under src (includes src/app and src/app/components)
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx}"
   ],
   theme: { extend: {} },
   plugins: [],
