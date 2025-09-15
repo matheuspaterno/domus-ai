@@ -9,14 +9,14 @@ export default function Home() {
       {/* Hero Section */}
       <section className="mb-16 text-center">
         <div className="flex justify-center">
-          <div className="mx-auto w-40 sm:w-56 md:w-72 lg:w-96 xl:w-[28rem]">
+          <div className="mx-auto w-52 sm:w-56 md:w-72 lg:w-96 xl:w-[28rem]">
             <Image
               src="/Domus%20AI%20logo.png"
               alt="Domus AI logo"
               width={800}
               height={200}
               priority
-              sizes="(max-width: 640px) 160px, (max-width: 768px) 224px, (max-width: 1024px) 288px, (max-width: 1280px) 384px, 448px"
+              sizes="(max-width: 640px) 208px, (max-width: 768px) 224px, (max-width: 1024px) 288px, (max-width: 1280px) 384px, 448px"
               style={{ width: '100%', height: 'auto' }}
             />
           </div>
