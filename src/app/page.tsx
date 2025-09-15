@@ -34,9 +34,9 @@ export default function Home() {
         <section className="glass-card p-10">
           <h2 className="text-3xl font-semibold mb-4 text-white"></h2>
           <p className="text-gray-300 leading-relaxed">
-            Domus AI builds the future of real estate research and automation. Whether you're an agent,
-            investor, or a first time homebuyer, Domus delivers AI-powered insights to help you make smarter decisions,
-            from neighborhood trends to lead discovery and lien alerts.
+            Domus AI builds the future of real estate research and automation. Whether you're a seller,
+            investor, or a first time homebuyer. Domus delivers AI-powered insights to help you make smarter decisions,
+            and instantly connect you with trusted real estate professionals tailored to you.
           </p>
         </section>
       </div>
