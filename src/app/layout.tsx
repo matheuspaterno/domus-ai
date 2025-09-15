@@ -21,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-black text-white scroll-smooth`}>
+  <body className={`${inter.className} bg-black text-white scroll-smooth`}>
         {/* reCAPTCHA v3 */}
         <script
           dangerouslySetInnerHTML={{ __html: `window.__grecaptchaOnLoad = function(){}` }}

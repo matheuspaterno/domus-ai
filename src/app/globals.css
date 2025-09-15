@@ -21,7 +21,14 @@
 html,body,#__next{
   height:100%;
   margin:0;
-  background:var(--bg);
+  /* Fallback color */
+  background: var(--bg);
+  /* Background image */
+  background-image: url('/domus-background.png');
+  background-size: cover;
+  background-position: center center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
   color:var(--white);
   font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
