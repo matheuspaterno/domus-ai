@@ -39,8 +39,11 @@ html,body,#__next{
     /* Remove the native background image to avoid duplicate layers */
     background-image: none;
     background-attachment: scroll;
-    background-color: var(--bg);
+    /* Make root backgrounds transparent so the fixed layer is visible */
+    background: transparent !important;
+    min-height: 100%;
   }
+  body{ position: relative; }
   body::before{
     content: "";
     position: fixed;
@@ -50,7 +53,7 @@ html,body,#__next{
     background-position: center center;
     background-repeat: no-repeat;
     pointer-events: none;
-    z-index: -1; /* behind content, above body background color */
+    z-index: -1; /* behind content; root backgrounds are transparent */
     transform: translateZ(0);
     will-change: transform;
   }
