@@ -31,15 +31,17 @@ export default function RootLayout({
         <div className="flex flex-col min-h-screen">
           <header className="fixed top-0 left-0 right-0 w-full z-50 bg-gray-900/80 backdrop-blur-md text-white/6">
             <div className="max-w-6xl w-full mx-auto flex items-center gap-4 p-4">
-              <a href="/" className="flex items-center gap-4">
-                <Image
-                  src="/domus.png"
-                  alt="Domus AI"
-                  width={48}
-                  height={48}
-                  className="rounded-md"
-                />
-                <span className="text-2xl font-bold">Domus AI</span>
+              <a href="/" aria-label="Domus AI Home" className="flex items-center gap-4">
+                <div className="relative h-10 sm:h-12 md:h-14 w-44 sm:w-56 md:w-64">
+                  <Image
+                    src="/Domus%20AI%20logo.png"
+                    alt="Domus AI logo"
+                    fill
+                    sizes="(max-width: 640px) 176px, (max-width: 768px) 224px, 256px"
+                    className="object-contain"
+                    priority
+                  />
+                </div>
               </a>
             </div>
           </header>
