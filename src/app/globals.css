@@ -33,6 +33,29 @@ html,body,#__next{
   font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
+/* Ensure background stays fixed on small screens (mobile browsers often ignore background-attachment: fixed) */
+@media (max-width: 640px){
+  html, body{
+    /* Remove the native background image to avoid duplicate layers */
+    background-image: none;
+    background-attachment: scroll;
+    background-color: var(--bg);
+  }
+  body::before{
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: url('/domus-background.png');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    z-index: -1; /* behind content, above body background color */
+    transform: translateZ(0);
+    will-change: transform;
+  }
+}
+
 /* Basic container */
 .max-w-5xl{ max-width: 64rem; margin-left:auto; margin-right:auto; }
 .mx-auto{ margin-left:auto; margin-right:auto; }
