@@ -33,7 +33,7 @@ export default function Home() {
   <div className="ai-container mt-[15px] mb-12">
         <section className="glass-card p-10">
           <h2 className="text-3xl font-semibold mb-4 text-white"></h2>
-          <p className="text-gray-300 leading-relaxed">
+          <p className="leading-relaxed" style={{ color: '#fff' }}>
             Domus AI builds the future of real estate research and automation. Whether you're a seller,
             investor, or a first time homebuyer. Domus delivers AI-powered insights to help you make smarter decisions,
             and instantly connect you with trusted real estate professionals tailored to you.
@@ -67,7 +67,7 @@ export default function Home() {
 
   <div className="ai-container mt-[15px] mb-8">
         <h2 className="text-3xl font-bold mb-4 text-center text-white">Contact a Real Estate Agent</h2>
-        <p className="text-center text-gray-300 mb-6">
+  <p className="text-center mb-6" style={{ color: '#fff' }}>
           We will send you an email asking for your details, compile your preferences, and use Domus AI to find the Real Estate Agent that fits you best in your area.
         </p>
       </div>

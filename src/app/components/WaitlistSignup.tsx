@@ -61,7 +61,7 @@ export default function WaitlistSignup() {
         throw new Error((payload?.error || `Server responded ${res.status}`) + extra)
       }
 
-      setSuccess(payload?.message || 'Thanks — we will connect you with an agent shortly.')
+      setSuccess(payload?.message || 'Thanks — check your email for questionnaire.')
       setEmail('')
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err)
